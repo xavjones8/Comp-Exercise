@@ -1,3 +1,4 @@
+package src;
 import java.util.*;
 
 /**
@@ -71,7 +72,7 @@ public class Event {
     boolean isOverlapping;
 
     /** Holds all events in the program */
-    public static Event[] events = new Event[Integer.MAX_VALUE];
+    public static Event[] events = new Event[20];
 
 
 
