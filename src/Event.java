@@ -1,4 +1,5 @@
 package src;
+
 import java.util.*;
 
 /**
@@ -8,6 +9,7 @@ import java.util.*;
 * @author Brianna Soto
 * @version 1.0
 */
+
 public class Event {
 
     //Class Constants
@@ -53,6 +55,9 @@ public class Event {
     /** The maximuim length of the date substring */
     public static final int DATE_LENGTH_MAX = 10;
 
+    /** Size of the Event array */
+    public static final int EVENT_ARRAY_SIZE = 20;
+
     /** Date of event */
     String date;
 
@@ -65,24 +70,26 @@ public class Event {
     /** eventDescription of event */
     String eventDescription;
 
-    /** Whether the user has plans for that day or not */
-    boolean noPlans;
-
     /** Whether the user has overlapping plans for that day or not */
     boolean isOverlapping;
 
+    //TODO - Should not have a set size
     /** Holds all events in the program */
-    public static Event[] events = new Event[20];
+    public static Event[] events = new Event[EVENT_ARRAY_SIZE];
+
+
 
 
 
     /**
-     * Constructs an event object using an inputted date, start time, end time, and eventDescription.
+     * Constructs an event object using an inputted date,
+     * start time, end time, and eventDescription.
      * @param date is the date entered by user
      * @param startTime the beginning time to the event entered by user
      * @param endTime the end timeof the event entered by user
      * @param eventDescription the eventDescription of the event entered by user
-     * @throws IllegalArgumentException if date, start or end times are formatted incorrectly.
+     * @throws IllegalArgumentException if date, start or end
+     * times are formatted incorrectly.
      */
     public Event(String date, String startTime, String endTime, String eventDescription) {
         //Test fidelity of date string XX/XX/XXXX
@@ -108,7 +115,8 @@ public class Event {
         }
         try {
             int hours = Integer.parseInt(startTime.substring(0,2));
-            int minutes = Integer.parseInt(startTime.substring(MINUTE_START_INDEX, MINUTE_END_INDEX));
+            int minutes = Integer.parseInt
+                (startTime.substring(MINUTE_START_INDEX, MINUTE_END_INDEX));
             //if((hours))
         } catch (NumberFormatException e){
             throw new IllegalArgumentException("Invalid Start Time");
@@ -282,23 +290,24 @@ public class Event {
      * @param date is the date of the event entered by the user.
      * @return string containing info of those dates.
      */
-    public static String findDate(String date) {
+    public static Event findDate(String date) {
         //Goal here is to go in order and find any events that may have the same date.
         //If the element is null in events, then break, as events are assigned in order.
-        String message = "";
+        int count = 0;
         for(int i = 0; i < events.length; i++) {
             if(events[i] == null) break;
-            if(events[i].getDate().equals(date)) message += (events[i].toString() + "\n");
+            if(events[i].getDate().equals(date)) return events[i];
         }
-        return message;
+        return null;
     }
+
 
     /**
      * Creates string to be printed
      */
+
     @Override
     public String toString() {
-        //TODO this may have unexpected results when a date has multiple events
         String message = "";
         message += this.date + "\n";
         message += this.eventDescription + " ";
@@ -306,10 +315,15 @@ public class Event {
         return message;
     }
 
+    /**
+     * Creates string to be printed
+     * @param args command line arguments
+     */
+
     public static void main(String args[]){
+
         String date = "12/20/2021";
         Event event = new Event("11/30/2020", "10:40", "2:40", "hi");
-        System.out.println((Event.findDate(date) == "") ? false : true);
     }
 
 }
