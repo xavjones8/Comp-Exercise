@@ -10,6 +10,12 @@ import java.util.*;
 * @version 1.0
 */
 
+/* Only checkstyle warnings
+[WARN] /Users/xavierjones/Documents/csc116/Comp Exercise/Comp-Exercise/src/Event.java:260:57: '12' is a magic number. [MagicNumber]
+[WARN] /Users/xavierjones/Documents/csc116/Comp Exercise/Comp-Exercise/src/Event.java:264:71: '31' is a magic number. [MagicNumber]
+[WARN] /Users/xavierjones/Documents/csc116/Comp Exercise/Comp-Exercise/src/Event.java:286:25: '24' is a magic number. [MagicNumber]
+[WARN] /Users/xavierjones/Documents/csc116/Comp Exercise/Comp-Exercise/src/Event.java:287:28: '60' is a magic number. [MagicNumber]
+*/
 public class Event {
 
     //Class Constants
@@ -69,12 +75,16 @@ public class Event {
 
     /** eventDescription of event */
     String eventDescription;
-
+    //Date Start End Title
     /** Whether the user has overlapping plans for that day or not */
     boolean isOverlapping;
 
     /** Holds all events in the program */
     public static ArrayList<Event> events = new ArrayList<Event>();
+    //Note - an array list is just an array that doesn't have a set Size
+    //To add to it, do events.add(whatever u want);
+    //To remove, do events.remove(whatever u want);
+    //Much more convenient to use
 
     /**
      * Constructs an event object using an inputted date,
@@ -88,7 +98,7 @@ public class Event {
      */
     public Event(String date, String startTime, String endTime, String eventDescription) {
         if(checkDateString(date)) this.date = date;
-        else throw new IllegalArgumentException("Invalid date");
+        else throw new IllegalArgumentException("Invalid Date");
 
         if(checkTimeString(startTime)) this.startTime = startTime;
         else throw new IllegalArgumentException("Invalid Start Time");
@@ -110,10 +120,10 @@ public class Event {
     public Event(String date, String eventDescription) {
 
         if(checkDateString(date)) this.date = date;
-        else throw new IllegalArgumentException("Invalid date");
+        else throw new IllegalArgumentException("Invalid Date");
 
         this.eventDescription = eventDescription;
-    
+
         events.add(this);
     }
 
@@ -151,8 +161,7 @@ public class Event {
         //No idea if that works but it's a rough idea
         //10:30
         //01234
-        if(time.length() != LENGTH_OF_TIME_STRING) throw new
-            IllegalArgumentException("Invalid time string format");
+        if(!checkTimeString(time)) throw new IllegalArgumentException("Invalid Time");
         int hour = Integer.parseInt(time.substring(0,2));
         return hour;
     }
@@ -165,8 +174,7 @@ public class Event {
      */
     public int getMinute(String time) {
         //No idea if that works but it's a rough idea
-        if(time.length() != LENGTH_OF_TIME_STRING) throw new
-            IllegalArgumentException("Invalid time string format");
+        if(!checkTimeString(time)) throw new IllegalArgumentException("Invalid Time");
         int minute = Integer.parseInt(time.substring(MINUTE_START_INDEX,MINUTE_END_INDEX));
         return minute;
     }
@@ -185,6 +193,7 @@ public class Event {
     * @return Whether there are no plans on a date.
     */
     public boolean noPlans(String date) {
+        if(!checkDateString(date)) throw new IllegalArgumentException("Invalid Date");
         boolean noPlans = true;
         for(Event event : events){
             if(date.equals(event.getDate())) noPlans = false;
@@ -227,6 +236,7 @@ public class Event {
      * @return string containing info of those dates.
      */
     public static Event findDate(String date) {
+        if(!checkDateString(date)) throw new IllegalArgumentException("Invalid Date");
         for(Event event : events){
             if(date.equals(event.getDate())) return event;
         }
@@ -241,9 +251,15 @@ public class Event {
     @Override
     public String toString() {
         String message = "";
-        message += this.date + "\n";
-        message += this.eventDescription + " ";
-        message += this.startTime + " - " + this.endTime;
+        if(this.getStartTime() == null) {
+            message += this.date + "\n";
+            message += this.eventDescription + " ";
+            message += this.startTime + " - " + this.endTime;
+            return message;
+        } else {
+            message += this.date + "\n";
+            message += this.eventDescription + " - All Day";
+        }
         return message;
     }
 
@@ -256,7 +272,7 @@ public class Event {
         if(date.length() != DATE_LENGTH_MAX ) return false;
         if((date.charAt(2) != '/') || (date.charAt(SLASH_INDEX) != '/')) return false;
         try {
-            if(Integer.parseInt(date.substring(0,2)) <= 0 || 
+            if(Integer.parseInt(date.substring(0,2)) <= 0 ||
                 Integer.parseInt(date.substring(0,2)) > 12){
                 return false;
             }
@@ -289,6 +305,6 @@ public class Event {
             return false;
         }
         return true;
-    } 
+    }
 
 }

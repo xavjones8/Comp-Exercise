@@ -7,7 +7,6 @@ import java.awt.event.*;
 
 /**
  * This program creates the event Jframe
- *
  * @author Jamel Clarke
  * @author Xavier Jones
  * @author Brianna Soto
@@ -187,25 +186,29 @@ public class CreateEventFrame extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent event) {
+        //If ready to submit
         if (event.getSource() == btnSubmit) {
+            //If we are just creating an event and the date is formatted correctly
             if (editedEvent == null) {
                 if (!Event.checkDateString(txtEventDate.getText())) {
                     JOptionPane.showMessageDialog(null, "Your date is formatted incorrectly");
-                } 
+                }
             }
+            //If the event is not an all day event, check if start/end time is formatted correctly
             if (!checkAllDay.isSelected()) {
                 if (!Event.checkTimeString(txtStartTime.getText())) {
                     JOptionPane.showMessageDialog(null, "Your start time is formatted incorrectly");
                 } else if (!Event.checkTimeString(txtEndTime.getText())) {
                     JOptionPane.showMessageDialog(null, "Your end time is formatted incorrectly");
                 } else {
+                    //Create the new event, or edit the old one
                     if (editedEvent == null) {
-                        Event newEvent = new Event(txtEventDate.getText(), 
+                        Event newEvent = new Event(txtEventDate.getText(),
                                         txtStartTime.getText(),
                                         txtEndTime.getText(),
                                         txtEventTitle.getText());
                     } else {
-                        Event newEvent = new Event(editedEvent.getDate(), 
+                        Event newEvent = new Event(editedEvent.getDate(),
                                         txtStartTime.getText(),
                                         txtEndTime.getText(),
                                         txtEventTitle.getText());
@@ -214,12 +217,13 @@ public class CreateEventFrame extends JFrame implements ActionListener {
                     this.setVisible(false);
                     System.out.println(Event.events.toString());
                 }
+                //If event is an all day event, create or edit an event.
             } else {
                 if (editedEvent == null) {
-                    Event newEvent = new Event(txtEventDate.getText(), 
+                    Event newEvent = new Event(txtEventDate.getText(),
                                         txtEventTitle.getText());
                 } else {
-                    Event newEvent = new Event(editedEvent.getDate(), 
+                    Event newEvent = new Event(editedEvent.getDate(),
                                         txtEventTitle.getText());
                     Event.events.remove(editedEvent);
                 }
@@ -248,9 +252,9 @@ public class CreateEventFrame extends JFrame implements ActionListener {
             }
         }
 
-        
+
     }
 
- 
+
 
 }
