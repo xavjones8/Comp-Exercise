@@ -118,7 +118,9 @@ public class DailyPlanner extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent event) {
 
-        if (event.getSource() == btnExit) System.exit(0);
+        if (event.getSource() == btnExit) {
+            System.exit(0);
+        }
 
         if (Event.checkDateString(txtGetDate.getText())) {
             if (event.getSource() == btnCreateEvent) {
@@ -156,26 +158,20 @@ public class DailyPlanner extends JFrame implements ActionListener {
      * @param args holds command line arguments
      */
     public static void main(String[]args) throws FileNotFoundException{
-        DailyPlanner plannerFrame = new DailyPlanner();
-
         //printing to the doc w/ new
-        try {
-            filename = args[0];
-            write = new PrintWriter(new FileOutputStream(filename));
+            filename = "files/events.txt";
+            outputScnr = new Scanner (new FileInputStream(filename));
+            printEvents();
+            DailyPlanner plannerFrame = new DailyPlanner();
         }
-        catch(FileNotFoundException e) {
-            filename = JOptionPane.showInputDialog(null, "The file could not be found," +
-                                                   " please try again:");
-        }
-        outputScnr = new Scanner (filename);
-        printEvents();
-        }
+
+        
 
     /*
      * Reads through the inputted file and creates events based off of each line. Then is outputs
      * all of the original events and the new events into a new file.
      */
-    public static void printEvents() {
+    public static void printEvents() throws FileNotFoundException{
         // turning the stuff from the file into events
         while (outputScnr.hasNextLine()) {
             //all day (denoted by an a at the beginning of the line)
@@ -184,9 +180,7 @@ public class DailyPlanner extends JFrame implements ActionListener {
                 String fileDate = outputScnr.next();
                 String fileDesc = outputScnr.nextLine();
                 Event e = new Event(fileDate, fileDesc);
-                break;
-            }
-            else {
+            } else {
                 String fileDate = outputScnr.next();
                 String fileStartTime = outputScnr.next();
                 String fileEndTime = outputScnr.next();
@@ -197,20 +191,17 @@ public class DailyPlanner extends JFrame implements ActionListener {
         }
 
         //the literal output
-        write = new PrintWriter(new FileOutputStream("UpdatedEvents.txt"));
+        write = new PrintWriter(new FileOutputStream("files/UpdatedEvents.txt"));
 
         //For loop works weird w Arraylist so i jus swiched to a for each
         for(Event event : Event.events) {
             String date = event.getDate();
             if(event.getStartTime() != null) {
-                write.print(date.substring(0,2) + "   " + date.substring(DAY_START,DAY_END) +
-                            "   " + date.substring(YEAR_START,YEAR_END) + " " +
-                            event.getStartTime() + "\n" +
-                            event.getDescription() + "\n");
+                write.print(("s " + event.getDate() + " " + event.getStartTime() +
+                            " " + event.getEndTime() + " " +
+                            event.getDescription() + "\n"));
             } else {
-                write.print(date.substring(0,2) + "   " + date.substring(DAY_START,DAY_END) +
-                            "   " +  date.substring(YEAR_START,YEAR_END) + "\n" +
-                            event.getDescription() + "\n");
+                write.print("a " + event.getDate() + " " + event.getDescription() + "\n");
             }
         }
         write.close();

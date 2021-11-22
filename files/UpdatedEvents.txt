@@ -1,0 +1,5 @@
+a 12/20/2021  Founder's Day
+s 11/23/2021 15:00 16:50  CSC 116 Comprehensive Exercise Presentations
+s 12/07/2021 15:30 18:00  CSC 116 Final Exam
+a 11/25/2021  Thanksgiving
+a 11/26/2021  Native American Heritage Day
