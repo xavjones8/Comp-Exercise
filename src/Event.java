@@ -73,13 +73,8 @@ public class Event {
     /** Whether the user has overlapping plans for that day or not */
     boolean isOverlapping;
 
-    //TODO - Should not have a set size
     /** Holds all events in the program */
-    public static Event[] events = new Event[EVENT_ARRAY_SIZE];
-
-
-
-
+    public static ArrayList<Event> events = new ArrayList<Event>();
 
     /**
      * Constructs an event object using an inputted date,
@@ -92,59 +87,18 @@ public class Event {
      * times are formatted incorrectly.
      */
     public Event(String date, String startTime, String endTime, String eventDescription) {
-        //Test fidelity of date string XX/XX/XXXX
-        if(date.length() != DATE_LENGTH_MAX ) throw new IllegalArgumentException("Invalid Date");
-        if((date.charAt(2) != '/') || (date.charAt(SLASH_INDEX) != '/')){
-            throw new IllegalArgumentException("Invalid Date");
-        }
-        try {
-            Integer.parseInt(date.substring(0,2));
-            Integer.parseInt(date.substring(DAY_START,DAY_END));
-            Integer.parseInt(date.substring(YEAR_START,YEAR_END));
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid Date");
-        }
-        this.date = date;
+        if(checkDateString(date)) this.date = date;
+        else throw new IllegalArgumentException("Invalid date");
 
-        //Tests fidelity of startTime
-        if(startTime.length() != LENGTH_OF_TIME_STRING) {
-            throw new IllegalArgumentException("Invalid Start Time");
-        }
-        if(startTime.charAt(TIME_SEMICOLON_INDEX) != ':') {
-            throw new IllegalArgumentException("Invalid Start Time");
-        }
-        try {
-            int hours = Integer.parseInt(startTime.substring(0,2));
-            int minutes = Integer.parseInt
-                (startTime.substring(MINUTE_START_INDEX, MINUTE_END_INDEX));
-            //if((hours))
-        } catch (NumberFormatException e){
-            throw new IllegalArgumentException("Invalid Start Time");
-        }
-        this.startTime = startTime;
+        if(checkTimeString(startTime)) this.startTime = startTime;
+        else throw new IllegalArgumentException("Invalid Start Time");
 
-        //Tests fidelity of endTime string
-        if(endTime.length() != LENGTH_OF_TIME_STRING) {
-            throw new IllegalArgumentException("Invalid End Time");
-        }
-        if(endTime.charAt(TIME_SEMICOLON_INDEX) != ':') {
-            throw new IllegalArgumentException("Invalid End Time");
-        }
-        try {
-            Integer.parseInt(endTime.substring(0,2));
-            Integer.parseInt(endTime.substring(MINUTE_START_INDEX, MINUTE_END_INDEX));
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid End Time");
-        }
-        this.endTime = endTime;
+        if(checkTimeString(endTime)) this.endTime = endTime;
+        else throw new IllegalArgumentException("Invalid End Time");
 
         this.eventDescription = eventDescription;
-        for(int i = 0; i < events.length; i++) {
-            if(events[i] == null) {
-                events[i] = this;
-                break;
-            }
-        }
+
+        events.add(this);
     }
 
     /**
@@ -154,28 +108,13 @@ public class Event {
      * @throws IllegalArgumentException if the date is not formatted correctly.
      */
     public Event(String date, String eventDescription) {
-        //Test fidelity of date string XX/XX/XXXX
-        if(date.length() != DATE_LENGTH_MAX ) throw new IllegalArgumentException("Invalid Date");
 
-        if((date.charAt(2) != '/') || (date.charAt(SLASH_INDEX) != '/')) {
-            throw new IllegalArgumentException("Invalid Date");
-        }
+        if(checkDateString(date)) this.date = date;
+        else throw new IllegalArgumentException("Invalid date");
 
-        try {
-            Integer.parseInt(date.substring(0,2));
-            Integer.parseInt(date.substring(DAY_START,DAY_END));
-            Integer.parseInt(date.substring(YEAR_START,YEAR_END));
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid Date");
-        }
-        this.date = date;
         this.eventDescription = eventDescription;
-        for(int i = 0; i < events.length; i++) {
-            if(events[i] == null) {
-                events[i] = this;
-                break;
-            }
-        }
+    
+        events.add(this);
     }
 
     /**
@@ -247,11 +186,8 @@ public class Event {
     */
     public boolean noPlans(String date) {
         boolean noPlans = true;
-        for (int i = 0; i < events.length; i++) {
-            if (events[i].getDate().equals(date)) {
-                noPlans = false;
-                return noPlans;
-            }
+        for(Event event : events){
+            if(date.equals(event.getDate())) noPlans = false;
         }
         return noPlans;
     }
@@ -286,17 +222,13 @@ public class Event {
     }
 
     /**
-     * Finds events that have the same date value
+     * Finds events that have a specific date value
      * @param date is the date of the event entered by the user.
      * @return string containing info of those dates.
      */
     public static Event findDate(String date) {
-        //Goal here is to go in order and find any events that may have the same date.
-        //If the element is null in events, then break, as events are assigned in order.
-        int count = 0;
-        for(int i = 0; i < events.length; i++) {
-            if(events[i] == null) break;
-            if(events[i].getDate().equals(date)) return events[i];
+        for(Event event : events){
+            if(date.equals(event.getDate())) return event;
         }
         return null;
     }
@@ -315,15 +247,48 @@ public class Event {
         return message;
     }
 
-    /**
-     * Creates string to be printed
-     * @param args command line arguments
+     /**
+     * Checks whether a date string is correct
+     * @param date holds the date string to check
+     * @return true if date string is correct
      */
-
-    public static void main(String args[]){
-
-        String date = "12/20/2021";
-        Event event = new Event("11/30/2020", "10:40", "2:40", "hi");
+    public static boolean checkDateString(String date){
+        if(date.length() != DATE_LENGTH_MAX ) return false;
+        if((date.charAt(2) != '/') || (date.charAt(SLASH_INDEX) != '/')) return false;
+        try {
+            if(Integer.parseInt(date.substring(0,2)) <= 0 || 
+                Integer.parseInt(date.substring(0,2)) > 12){
+                return false;
+            }
+            if(Integer.parseInt(date.substring(DAY_START,DAY_END)) <= 0 ||
+                Integer.parseInt(date.substring(DAY_START,DAY_END)) > 31) {
+                return false;
+            }
+            Integer.parseInt(date.substring(YEAR_START,YEAR_END));
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
     }
+
+     /**
+     * Checks whether a time string is correct
+     * @param time holds the time string to check
+     * @return true if time string is correct
+    */
+    public static boolean checkTimeString(String time){
+        if(time.length() != LENGTH_OF_TIME_STRING) return false;
+        if(time.charAt(TIME_SEMICOLON_INDEX) != ':') return false;
+        try {
+            int hours = Integer.parseInt(time.substring(0,2));
+            int minutes = Integer.parseInt
+                (time.substring(MINUTE_START_INDEX, MINUTE_END_INDEX));
+            if((hours > 24 || hours < 0)) return false;
+            if((minutes >= 60 || minutes < 0)) return false;
+        } catch (NumberFormatException e){
+            return false;
+        }
+        return true;
+    } 
 
 }

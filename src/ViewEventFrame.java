@@ -1,9 +1,7 @@
 package src;
+
 import java.util.*;
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.text.View;
-
 import java.awt.*;
 import java.awt.event.*;
 
@@ -14,10 +12,13 @@ import java.awt.event.*;
 * @author Xavier Jones
 * @author Brianna Soto
 */
-public class ViewEventFrame extends JFrame implements ActionListener{
+public class ViewEventFrame extends JFrame implements ActionListener {
+
+    /** Holds event that may be viewed */
+    private Event viewedEvent;
 
     /** 'Events:' label */
-    private JLabel lblDescriptionTitle = new JLabel("Events:");
+    private JLabel lblDescriptionTitle = new JLabel("\t\tEvents:");
 
     /** [] */
     private JLabel lblDateRundown = new JLabel();
@@ -28,28 +29,43 @@ public class ViewEventFrame extends JFrame implements ActionListener{
     /** Exit button */
     private JButton btnExit = new JButton("Exit");
 
+    /** Delete button */
+    private JButton btnDelete = new JButton("Delete");
 
-    //TODO - Add action listeners for buttons
-    //TODO - setDefaultCloseOperation should return to main menu, not exit
+    /** Width of Frame */
+    public static final int WIDTH = 400;
+
+    /** Length of Frame */
+    public static final int LENGTH = 300;
+
     /**
      * Creates a view Event frame that will display the details of an inputted Event
      * @param event the Event that will have its details displayed in the view Event frame
      */
-    public ViewEventFrame(Event event){
-        super(event.getDate());
-        setSize(300,150);
+    public ViewEventFrame(Event event) {
+        super(event.getDescription());
+        viewedEvent = event;
+        setSize(WIDTH,LENGTH);
         setResizable(false);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         Container c = getContentPane();
         c.setBackground(Color.pink);
         c.setForeground(Color.white);
-        c.setLayout(new GridLayout(2,2));
+        c.setLayout(new GridLayout(3,2));
+
+        //Adds action listeners
+        btnBack.addActionListener(this);
+        btnExit.addActionListener(this);
+        btnDelete.addActionListener(this);
 
         c.add(lblDescriptionTitle);
         lblDescriptionTitle.setForeground(Color.white);
 
         c.add(lblDateRundown);
         lblDateRundown.setForeground(Color.white);
+        lblDateRundown.setText(viewedEvent.toString());
+        c.add(btnDelete);
+        btnDelete.setForeground(Color.pink);
 
         c.add(btnBack);
         btnBack.setForeground(Color.pink);
@@ -60,18 +76,19 @@ public class ViewEventFrame extends JFrame implements ActionListener{
         setVisible(true);
     }
 
-    /**
-    * Implements actionPerformed for buttons in the program
-    * @param event
-    */
     @Override
     public void actionPerformed(ActionEvent event) {
+        if (event.getSource() == btnExit) {
+            System.exit(0);
+        }
 
+        if (event.getSource() == btnBack) {
+            this.setVisible(false);
+        }
 
-
-    }
-
-    public static void main(String[] args) {
-        ViewEventFrame editFrame = new ViewEventFrame(new Event("05/20/2003","Xavier's Birthday"));
+        if (event.getSource() == btnDelete) {
+            Event.events.remove(viewedEvent);
+            this.setVisible(false);
+        }
     }
 }

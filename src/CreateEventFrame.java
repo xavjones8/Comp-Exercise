@@ -1,4 +1,5 @@
 package src;
+
 import java.util.*;
 import javax.swing.*;
 import java.awt.*;
@@ -14,7 +15,10 @@ import java.awt.event.*;
  * @version 1.0
  */
 
-public class CreateEventFrame extends JFrame {
+public class CreateEventFrame extends JFrame implements ActionListener {
+
+    /** Holds event that may be edited */
+    private Event editedEvent;
 
     /** 'Enter Title' label */
     private JLabel lblEventTitlePrompt = new JLabel("\t\tEnter Event Title: ");
@@ -55,25 +59,40 @@ public class CreateEventFrame extends JFrame {
     /** Delete event button */
     private JButton btnDelete = new JButton("Delete Event");
 
-    //TODO - Add Action LIsteneres to the Frame Submit Buttons
-    //TODO - Add Action Liseners to the checkbox to disable start/end time text fields when checked
+    /** Width of Frame */
+    public static final int WIDTH = 500;
+
+    /** Length of Frame */
+    public static final int LENGTH = 300;
+
+    /** Number of display grid rows */
+    public static final int DISPLAY_ROWS = 6;
+
+    /** Margin size */
+    public static final int MARGIN_SIZE = 10;
+
     /**
      * Creates the create Event frame
+     * @param date holds the date to create an event with
      */
-    public CreateEventFrame() {
+    public CreateEventFrame(String date) {
         // Creates JFrame with title "Create Event"
         super("Create Event");
         System.out.println("Done");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(500,300);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setSize(WIDTH,LENGTH);
         setResizable(false);
         Container c = getContentPane();
         c.setBackground(Color.pink);
         c.setForeground(Color.white);
 
         //5 Rows, 2 columns, 10px hor. space gap, 10px ver. space gap
-        c.setLayout(new GridLayout(6,2,10,10));
+        c.setLayout(new GridLayout(DISPLAY_ROWS,2,MARGIN_SIZE,MARGIN_SIZE));
 
+        //Add Action listeners to buttons
+        btnSubmit.addActionListener(this);
+        btnExit.addActionListener(this);
+        checkAllDay.addActionListener(this);
         //Add components to container
         c.add(lblEventTitlePrompt);
         c.add(txtEventTitle);
@@ -84,6 +103,7 @@ public class CreateEventFrame extends JFrame {
         c.add(txtEventDate);
         lblEventDatePrompt.setForeground(Color.white);
         txtEventDate.setForeground(Color.pink);
+        txtEventDate.setText(date);
 
         c.add(lblALlDayCheck);
         c.add(checkAllDay);
@@ -115,15 +135,22 @@ public class CreateEventFrame extends JFrame {
 
         // Creates JFrame with title "Edit Event"
         super("Edit Event");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(500,300);
+        this.editedEvent = event;
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setSize(WIDTH ,LENGTH);
         setResizable(false);
         Container c = getContentPane();
         c.setBackground(Color.pink);
         c.setForeground(Color.white);
 
         //5 Rows, 2 columns, 10px hor. space gap, 10px ver. space gap
-        c.setLayout(new GridLayout(6,2,10,10));
+        c.setLayout(new GridLayout(DISPLAY_ROWS,2,MARGIN_SIZE,MARGIN_SIZE));
+
+        //Add Action listeners to buttons
+        btnSubmit.addActionListener(this);
+        btnDelete.addActionListener(this);
+        btnExit.addActionListener(this);
+        checkAllDay.addActionListener(this);
 
         //Add components to container
         c.add(lblEventTitlePrompt);
@@ -158,12 +185,72 @@ public class CreateEventFrame extends JFrame {
         setVisible(true);
     }
 
-    /**
-     * Calls Event frame
-     * @param args command line arguments
-     */
-    public static void main(String[] args) {
-       // CreateEventFrame frame = new CreateEventFrame();
-        CreateEventFrame editFrame = new CreateEventFrame(new Event("05/20/2003","Xavier's Birthday"));
+    @Override
+    public void actionPerformed(ActionEvent event) {
+        if (event.getSource() == btnSubmit) {
+            if (editedEvent == null) {
+                if (!Event.checkDateString(txtEventDate.getText())) {
+                    JOptionPane.showMessageDialog(null, "Your date is formatted incorrectly");
+                } 
+            }
+            if (!checkAllDay.isSelected()) {
+                if (!Event.checkTimeString(txtStartTime.getText())) {
+                    JOptionPane.showMessageDialog(null, "Your start time is formatted incorrectly");
+                } else if (!Event.checkTimeString(txtEndTime.getText())) {
+                    JOptionPane.showMessageDialog(null, "Your end time is formatted incorrectly");
+                } else {
+                    if (editedEvent == null) {
+                        Event newEvent = new Event(txtEventDate.getText(), 
+                                        txtStartTime.getText(),
+                                        txtEndTime.getText(),
+                                        txtEventTitle.getText());
+                    } else {
+                        Event newEvent = new Event(editedEvent.getDate(), 
+                                        txtStartTime.getText(),
+                                        txtEndTime.getText(),
+                                        txtEventTitle.getText());
+                        Event.events.remove(editedEvent);
+                    }
+                    this.setVisible(false);
+                    System.out.println(Event.events.toString());
+                }
+            } else {
+                if (editedEvent == null) {
+                    Event newEvent = new Event(txtEventDate.getText(), 
+                                        txtEventTitle.getText());
+                } else {
+                    Event newEvent = new Event(editedEvent.getDate(), 
+                                        txtEventTitle.getText());
+                    Event.events.remove(editedEvent);
+                }
+                this.setVisible(false);
+                System.out.println(Event.events.toString());
+            }
+        }
+        if (event.getSource() == btnExit) {
+            System.exit(0);
+        }
+        if (event.getSource() == btnDelete) {
+            Event.events.remove(editedEvent);
+            this.setVisible(false);
+        }
+        if (event.getSource() == checkAllDay) {
+            if (checkAllDay.isSelected()) {
+                System.out.println("Checked");
+                txtStartTime.setEnabled(false);
+                txtStartTime.setText("");
+                txtEndTime.setEnabled(false);
+                txtEndTime.setText("");
+            } else {
+                System.out.println("Unchecked");
+                txtStartTime.setEnabled(true);
+                txtEndTime.setEnabled(true);
+            }
+        }
+
+        
     }
+
+ 
+
 }

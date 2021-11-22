@@ -19,10 +19,16 @@ import java.io.*;
 public class DailyPlanner extends JFrame implements ActionListener {
 
     /** Width of Frame */
-    public static final int WIDTH = 300;
+    public static final int WIDTH = 400;
 
     /** Length of Frame */
     public static final int LENGTH = 150;
+
+    /** Label to prompt user for the date */
+    private JLabel lblGetDate = new JLabel("\t\tEnter Date: (MM/DD/YYYY)");
+
+    /** Text field that holds requested date */
+    private JTextField txtGetDate = new JTextField();
 
     /** Create event button */
     private JButton btnCreateEvent = new JButton("Create Event");
@@ -36,8 +42,8 @@ public class DailyPlanner extends JFrame implements ActionListener {
     /** Exit program button */
     private JButton btnExit = new JButton("Exit");
 
-    /** PrintWriter to putput events in a new file */
-    private PrintWriter write = new PrintWriter("Updated_Plannner.txt")
+    ///** PrintWriter to putput events in a new file */
+    //private PrintWriter write = new PrintWriter("Updated_Plannner.txt");
 
     /** Scanner to read through file */
     private Scanner output;
@@ -57,15 +63,13 @@ public class DailyPlanner extends JFrame implements ActionListener {
     /** The substring's end interval for the last digit of the year in the date substring */
     public static final int YEAR_END = 10;
 
-    /** The substring's end interval for the last digit of the year in the date substring */
-    public static final int YEAR_END = 10;
 
 
     /**
      * Creates backround and buttons
      *
      */
-    public DailyPlanner(){
+    public DailyPlanner() {
         //Iniitializes JFrame with title "Daily Planner"
         super("Daily Planner");
         //Sets up frame size
@@ -78,8 +82,10 @@ public class DailyPlanner extends JFrame implements ActionListener {
         c.setBackground(Color.pink);
         c.setForeground(Color.white);
         //Add a grid layout with 2 rows and 2 columns for 4 components
-        c.setLayout(new GridLayout(2,2));
+        c.setLayout(new GridLayout(3,2));
         //Changes fonts and colors of components
+        lblGetDate.setForeground(Color.white);
+        txtGetDate.setForeground(Color.pink);
         btnCreateEvent.setForeground(Color.pink);
         btnEditEvent.setForeground(Color.pink);
         btnViewEvent.setForeground(Color.pink);
@@ -91,58 +97,66 @@ public class DailyPlanner extends JFrame implements ActionListener {
         btnViewEvent.addActionListener(this);
         btnExit.addActionListener(this);
 
-        //Adds components to frame
+        //Adds components to frame\
+        c.add(lblGetDate);
+        c.add(txtGetDate);
         c.add(btnCreateEvent);
         c.add(btnEditEvent);
         c.add(btnViewEvent);
         c.add(btnExit);
         setVisible(true);
-      }
+    }
 
     //Need to add this method in order to implement ActionListemer
-   /**
-   * Implements actionPerformed for buttons in the program
-   * @param event the action performed when picking a button
-   */
-  @Override
-  public void actionPerformed(ActionEvent event) {
+    /**
+     * Implements actionPerformed for buttons in the program
+     * @param event the action performed when picking a button
+     */
+    @Override
+    public void actionPerformed(ActionEvent event) {
 
-    if (event.getSource() == btnCreateEvent){
-          CreateEventFrame createView = new CreateEventFrame();
-    }
+        if (event.getSource() == btnExit) System.exit(0);
 
-    if (event.getSource() == btnEditEvent){
-        //Add frame to ask for date
-        EnterDateFrame getDate = new EnterDateFrame();
-        int i = 0;
-        while(getDate.date == null){
-            Thread.sleep(482024249);
+        if (Event.checkDateString(txtGetDate.getText())) {
+            if (event.getSource() == btnCreateEvent) {
+                if(Event.findDate(txtGetDate.getText()) == null){
+                    CreateEventFrame createView = new CreateEventFrame(txtGetDate.getText());
+                } else {
+                    JOptionPane.showMessageDialog(null, 
+                                                "You already have an event scheduled on that day");
+                }
+                
+            }
+            if (event.getSource() == btnEditEvent) {
+                Event selectedEvent = Event.findDate(txtGetDate.getText());
+                if (selectedEvent != null) {
+                    CreateEventFrame createView = new CreateEventFrame(selectedEvent);
+                } else {
+                    JOptionPane.showMessageDialog(null, "There are no events on this day");
+                }
+            }
+            if (event.getSource() == btnViewEvent) {
+                Event selectedEvent = Event.findDate(txtGetDate.getText());
+                if (selectedEvent != null) {
+                    ViewEventFrame viewEvent = new ViewEventFrame(selectedEvent);
+                } else {
+                    JOptionPane.showMessageDialog(null, "There are no events on this day");
+                }
+            }
+        } else { 
+            JOptionPane.showMessageDialog(null, "Your date format is incorrect");
         }
-
-        CreateEventFrame editView = new CreateEventFrame(Event.findDate(getDate.date));
     }
 
-
-    if (event.getSource() == btnViewEvent){
-        //Add frame ot ask for date
-        EnterDateFrame getDate = new EnterDateFrame();
-        int i = 0;
-        while(getDate.date == null){
-            Thread.sleep(482024249);
-        }
-        ViewEventFrame viewFrame = new ViewEventFrame(Event.findDate(getDate.date));
-    }
-
-
-    if (event.getSource() == btnExit)
-        System.exit(0);
-
-  }
-
-    public static void main(String[]args){
+    /**
+     * Creates the main display frame
+     * @param args holds command line arguments
+     */
+    public static void main(String[]args) {
         DailyPlanner plannerFrame = new DailyPlanner();
 
         //printing to the doc w/ new Events
+        /*
         Scanner scnr = new Scanner (System.in);
         try {
             filename = args[0];
@@ -152,12 +166,12 @@ public class DailyPlanner extends JFrame implements ActionListener {
         }
         output = new Scanner (filename);
         printEvents();
-
+        */
     }
 
-    /**
+    /*
      * Outputs all of the new events into a new file.
-     */
+     
     public void printEvents() {
         //the events from the file
         while () {
@@ -170,7 +184,7 @@ public class DailyPlanner extends JFrame implements ActionListener {
         // the new Events
         for(int i = 0; i < Event.events.length; i++) {
             String date = Event.events[i].getDate();
-            if(Event.events[i] == null) write.print("");
+            if (Event.events[i] == null) write.print("");
             else{
                 if (!(Event.events[i].getStartTime.equals(null))) {
                     write.print(date.substring(0,2) + "   " + date.substring(DAY_START,DAY_END) +
@@ -186,7 +200,7 @@ public class DailyPlanner extends JFrame implements ActionListener {
             }
         }
     }
-
+*/
 
 
 }
